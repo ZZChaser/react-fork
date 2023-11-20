@@ -1,12 +1,12 @@
 import { beginWork } from './beginWork.js';
 import { completeWork } from './completeWork.js';
-import { FiberNode, createWorkInProgress } from './fiber.ts';
+import { FiberNode, FiberRootNode, createWorkInProgress } from './fiber.ts';
 import { HostRoot } from './workTags.js';
 
 let workInProgress: FiberNode | null = null;
 
-function prepareFreshStack(fiber: FiberNode) {
-	workInProgress = createWorkInProgress(fiber, {});
+function prepareFreshStack(root: FiberRootNode) {
+	workInProgress = createWorkInProgress(root.current, {});
 }
 
 export function scheduleUpdateOnFiber(fiber: FiberNode) {
@@ -29,18 +29,23 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	return null;
 }
 
-function renderRoot(root: FiberNode) {
+function renderRoot(root: FiberRootNode) {
 	// 初始化
 	prepareFreshStack(root);
 
 	do {
 		try {
-			workLoop(root);
+			workLoop();
 			break;
 		} catch (error) {
 			console.error('workLoop 发生错误：', error);
 		}
 	} while (true);
+
+	// const finishedWork = root.current.alternate;
+	// root.finishedWork = finishedWork;
+
+	// commitRoot(root);
 }
 
 function workLoop() {

@@ -17,6 +17,8 @@ export const beginWork = (wip: FiberNode) => {
 				console.warn('beginWork 为实现的类型');
 			}
 	}
+
+	return null;
 };
 
 function updateHostRoot(wip: FiberNode) {
