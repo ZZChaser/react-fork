@@ -1,8 +1,14 @@
 import { ReactElement } from 'shared/ReactTypes.js';
 import { FiberNode } from './fiber.ts';
 import { Update, processUpdateQueue } from './updateQueue.js';
-import { HostRoot, HostText, HostComponent } from './workTags.js';
+import {
+	HostRoot,
+	HostText,
+	HostComponent,
+	FunctionComponent
+} from './workTags.js';
 import { mountChildFibers, reconcileChildFibers } from './childFibers.js';
+import { renderWithHooks } from './fiberHooks.js';
 
 export const beginWork = (wip: FiberNode) => {
 	switch (wip.tag) {
@@ -12,6 +18,8 @@ export const beginWork = (wip: FiberNode) => {
 			return updateHostComponent(wip);
 		case HostText:
 			return null;
+		case FunctionComponent:
+			return updateFunctionComponent(wip);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork 为实现的类型');
@@ -53,4 +61,11 @@ function reconcileChildren(wip: FiberNode, children?: ReactElement) {
 		// mount
 		wip.child = mountChildFibers(wip, null, children);
 	}
+}
+
+function updateFunctionComponent(wip: FiberNode) {
+	const nextChildren = renderWithHooks(wip);
+	reconcileChildren(wip, nextChildren);
+
+	return wip.child;
 }

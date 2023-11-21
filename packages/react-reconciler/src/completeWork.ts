@@ -1,11 +1,17 @@
 import {
+	Container,
 	appendInitialChild,
 	createInstance,
 	createTextInstance
 } from 'hostConfig';
 import { FiberNode } from './fiber.ts';
 import { NoFlags } from './fiberFlags';
-import { HostComponent, HostRoot, HostText } from './workTags.js';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './workTags.js';
 
 export const completeWork = (wip: FiberNode) => {
 	// 递归中的归
@@ -42,6 +48,10 @@ export const completeWork = (wip: FiberNode) => {
 			bubbleProperties(wip);
 			return null;
 
+		case FunctionComponent:
+			bubbleProperties(wip);
+			return null;
+
 		default:
 			if (__DEV__) {
 				console.warn('未处理 complete work 情况', wip);
@@ -63,7 +73,7 @@ function bubbleProperties(wip: FiberNode) {
 	wip.subtreeFlags |= subtreeFlags;
 }
 
-function appendAllChildren(parent: FiberNode, wip: FiberNode) {
+function appendAllChildren(parent: Container, wip: FiberNode) {
 	let node = wip.child;
 
 	while (node !== null) {
